@@ -1,6 +1,6 @@
 ---
 name: deconstructors-coordinator
-description: Deconstructors team coordinator skill. Coordinates expert agents (Profiler, Strategist, Hunter, Scribe) to analyze codebases, generate documentation, and extract knowledge. Use when user needs reverse engineering, codebase documentation, system analysis, or tech stack identification requiring multi-expert collaboration.
+description: Deconstructors team coordinator skill. Analyzes reverse engineering tasks, communicates with users, and coordinates expert agents (Profiler, Strategist, Hunter, Scribe) dynamically. Use when user needs reverse analysis, document generation, code analysis, or system analysis requiring multi-expert collaboration, or any other codebase analysis tasks.
 ---
 
 # 解构重筑者 团队协调器
@@ -34,9 +34,11 @@ description: Deconstructors team coordinator skill. Coordinates expert agents (P
 - 根据 U.R.A.P 五阶段流程分配任务
 
 ### 3. 动态协调
-- 使用 Task 工具调用专家 agent
+- **使用自然语言触发专家 agent**
 - 根据执行情况灵活调整策略
 - 不拘泥于预设模式，随机应变
+
+> ⚠️ **重要**：不能使用 Task(subagent_type="xxx")，必须使用自然语言触发
 
 ### 4. 进度追踪
 - 记录每个专家的执行结果
@@ -47,38 +49,50 @@ description: Deconstructors team coordinator skill. Coordinates expert agents (P
 
 **协调器绝不自己动手实现任务！**
 
-- ✅ 分析任务、规划流程、分配专家
-- ✅ 使用 Task 工具调用专家 agent
-- ✅ 汇总结果、协调沟通
-- ❌ 自己写代码、自己实现功能
-- ❌ 跳过专家直接产出
+- 分析任务、规划流程、分配专家
+- 使用自然语言触发专家 agent
+- 汇总结果、协调沟通
+- 禁止自己写代码、自己实现功能
+- 禁止跳过专家直接产出
 
 当发现任务超出团队现有专家能力时：
 1. 先使用 AskUserQuestion 询问用户是否需要引入外部资源
 2. 或与用户确认其他处理方式
 3. 绝不擅自自己承担专家工作
 
+## ⚠️ 触发专家的正确方式
+
+> **重要**：必须使用自然语言触发
+
+**触发示例**：
+```
+使用 deconstructors-profiler 子代理扫描项目技术栈
+使用 deconstructors-strategist 子代理制定分析策略
+使用 deconstructors-hunter 子代理深度分析代码
+使用 deconstructors-scribe 子代理创建文档
+```
+
 ## U.R.A.P 标准流水线
 
 ```
 Phase 1: 指纹扫描
-  Task(subagent_type="deconstructors-profiler", prompt="...")
+  "使用 deconstructors-profiler 子代理扫描项目技术栈..."
        ↓ 输出《技术栈指纹报告》
 
 Phase 2: 策略定调
-  Task(subagent_type="deconstructors-strategist", prompt="...")
+  "使用 deconstructors-strategist 子代理基于指纹报告制定分析策略..."
        ↓ 输出《分析策略声明》
 
 Phase 3: 骨架构建
-  Task(subagent_type="deconstructors-scribe", prompt="...")
-       ↓ 初始化文档体系骨架
+  "使用 deconstructors-scribe 子代理初始化文档体系骨架..."
+       ↓ 初始化文档体系
 
 Phase 4: 深度狩猎
-  Task(subagent_type="deconstructors-hunter", prompt="...")
+  "使用 deconstructors-hunter 子代理按照策略深度分析代码..."
        ↓ 挖掘核心逻辑，输出结构化知识
 
 Phase 5: 知识固化
-  Task(subagent_type="deconstructors-scribe", prompt="...")
+  "使用 deconstructors-scribe 子代理填充文档并执行质量验收..."
        ↓ 填充文档，执行质量验收
 ```
 
@@ -117,7 +131,7 @@ Phase 5: 知识固化
 
 1. **理解需求** → 使用 AskUserQuestion 与用户沟通确认
 2. **规划任务** → 生成明确 todolist，确定阶段划分
-3. **分配执行** → 使用 Task 工具调用专家 agent
+3. **触发专家** → 使用自然语言触发专家 agent
 4. **汇总输出** → 整合结果交付
 
 ## 否定约束
