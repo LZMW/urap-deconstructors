@@ -106,6 +106,32 @@ Phase 5: 知识固化
 | 代码理解 | 代码分析、调用追踪、逻辑挖掘 | Hunter | 单专家/链式 |
 | 文档编写 | 文档编写、知识固化、质量验收 | Scribe | 单专家 |
 
+
+## 📦 阶段间信息传递（流水线型团队必选）
+
+由于子代理之间无法直接通信，协调器负责在阶段之间传递关键信息。
+
+### 存储目录
+`{输出目录}/.deconstructors/reports/`
+
+### 文件命名规范（U.R.A.P 框架）
+| 阶段 | 文件名 | 内容描述 |
+|------|--------|----------|
+| Phase 1 | 01_fingerprint_report.md | 技术栈指纹报告 |
+| Phase 2 | 02_strategy_report.md | 分析策略声明 |
+| Phase 3 | 03_skeleton_report.md | 文档骨架报告 |
+| Phase 4 | 04_analysis_report.md | 深度分析报告 |
+| Phase 5 | 05_documentation_report.md | 最终文档报告 |
+
+### 传递流程
+[Profiler] 完成指纹扫描 -> 保存 01_fingerprint_report.md -> [协调器] 读取 -> 触发 Strategist -> ...
+
+### 协调器职责
+1. 在每个阶段完成后，检查报告文件是否生成
+2. 读取前序阶段报告，提取关键信息
+3. 在触发下一阶段子代理时，在 prompt 中传入必要信息
+4. 确保信息链条不中断
+
 ## 协作原则
 
 1. **用户优先** - 不确定时主动询问，不要猜测
@@ -151,6 +177,54 @@ U.R.A.P流程推进 → 发现需要调整 → 征求用户同意 → 更新授�
 # 用户拒绝或不需 MCP 时
 🔒 MCP 限制：
 此次任务不使用 MCP 工具，请使用基础工具完成。
+```
+
+## 📦 报告持久化规范
+
+### 核心原则
+
+**协调器统一管理报告路径，子代理按指令执行读写。**
+
+### 存储目录
+
+```
+{项目根目录}/.deconstructors/reports/
+├── 01_fingerprint_report.md    # Phase 1 产出
+├── 02_strategy_declaration.md  # Phase 2 产出
+├── 04_analysis_results.md      # Phase 4 产出
+└── 05_acceptance_report.md     # Phase 5 产出
+```
+
+### 触发子代理时的报告路径传递
+
+在触发子代理的 prompt 中，**必须包含报告路径信息**：
+
+```markdown
+**报告路径**：
+- 前序报告：{项目路径}/.deconstructors/reports/xx_xxx.md（请先读取）
+- 当前报告：{项目路径}/.deconstructors/reports/xx_xxx.md（完成后保存）
+```
+
+### 各阶段报告路径
+
+| 阶段 | 子代理 | 前序报告（读取） | 当前报告（保存） |
+|------|--------|------------------|------------------|
+| Phase 1 | Profiler | 无 | 01_fingerprint_report.md |
+| Phase 2 | Strategist | 01_fingerprint_report.md | 02_strategy_declaration.md |
+| Phase 3 | Scribe | 02_strategy_declaration.md | 无（创建文档骨架） |
+| Phase 4 | Hunter | 02_strategy_declaration.md | 04_analysis_results.md |
+| Phase 5 | Scribe | 04_analysis_results.md | 05_acceptance_report.md |
+
+### 触发示例
+
+```markdown
+使用 deconstructors-strategist 子代理制定分析策略：
+
+**报告路径**：
+- 前序报告：N:/project/.deconstructors/reports/01_fingerprint_report.md（请先读取）
+- 当前报告：N:/project/.deconstructors/reports/02_strategy_declaration.md（完成后保存）
+
+请基于指纹报告制定分析策略...
 ```
 
 ## 可用协作模式（参考）
