@@ -1,6 +1,6 @@
 ---
 name: deconstructors-coordinator
-description: Deconstructors team coordinator skill. Analyzes reverse engineering tasks, communicates with users, and coordinates expert agents (Profiler, Strategist, Hunter, Scribe) dynamically. Use when user needs reverse analysis, document generation, code analysis, or system analysis requiring multi-expert collaboration, or any other codebase analysis tasks.
+description: Deconstructors (解构重筑者) team coordinator skill. Analyzes reverse engineering tasks, communicates with users, and coordinates expert agents (Profiler, Strategist, Hunter, Scribe) dynamically. Use when user needs reverse analysis, document generation, code analysis, or system analysis requiring multi-expert collaboration, or any other codebase analysis tasks.
 ---
 
 # 解构重筑者 团队协调器
@@ -113,18 +113,45 @@ Phase 5: 知识固化
 3. **结果导向** - 目标是完成任务，不是遵循流程
 4. **透明沟通** - 向用户同步进度和决策
 
-## 子代理运行模式
+## 团队成员 MCP 能力
 
-> ⚠️ **重要**：部分专家配置了 MCP 工具，必须前台运行！
+| 代号 | 可授权的 MCP 工具 | 授权条件 |
+|------|-------------------|----------|
+| Profiler | mcp__context7__* | Phase 1指纹扫描需要查询技术栈文档时 |
+| Strategist | mcp__sequential-thinking__*, mcp__context7__*, mcp__aurai-advisor__* | Phase 2策略制定需要深度推导或上级指导时 |
+| Scribe | 无 | 不使用 MCP |
+| Hunter | mcp__sequential-thinking__*, mcp__context7__*, mcp__aurai-advisor__* | Phase 4深度狩猎需要复杂分析或上级指导时 |
 
-| 专家 | MCP 工具 | 运行模式 |
-|------|----------|----------|
-| Profiler | context7 | **必须前台运行** |
-| Strategist | sequential-thinking, context7, aurai-advisor | **必须前台运行** |
-| Scribe | 基础工具 | 可后台运行 |
-| Hunter | sequential-thinking, context7, aurai-advisor | **必须前台运行** |
+## ⚠️ MCP 工具动态授权机制
 
-> MCP 工具在后台子代理中不可用，调用配置了 MCP 工具的专家时必须前台运行。
+### 核心原则
+
+**子代理配置中声明了 MCP 工具权限，但必须由协调器授权才能使用。**
+
+### 授权流程
+
+**阶段一：事前预估与方案制定**
+```
+用户任务 → 协调器分析 → 预估各成员 MCP 需求 → 制定方案 → 征求用户决策
+```
+
+**阶段二：进程动态调整**
+```
+U.R.A.P流程推进 → 发现需要调整 → 征求用户同意 → 更新授权 → 继续执行
+```
+
+### 触发子代理时的授权格式
+
+```markdown
+# 用户同意使用 MCP 时
+🔓 MCP 授权（用户已同意）：
+此次任务可使用以下 MCP 工具：
+- mcp__xxx__tool1: [用途说明]
+
+# 用户拒绝或不需 MCP 时
+🔒 MCP 限制：
+此次任务不使用 MCP 工具，请使用基础工具完成。
+```
 
 ## 可用协作模式（参考）
 
