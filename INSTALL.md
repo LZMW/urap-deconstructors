@@ -43,18 +43,6 @@ cp "N:/编程备份/3.0团队/deconstructors-team/agents/"*.md ~/.claude/agents/
 
 **确认文件已复制**：
 - `deconstructors-profiler.md`
-- `deconstructors-strategist.md`
-- `deconstructors-hunter.md`
-- `deconstructors-scribe.md`
-
-### 步骤 3：复制协调器 Skill
-
-```bash
-# Windows PowerShell
-Copy-Item -Path "N:\编程备份\3.0团队\deconstructors-team\skills\deconstructors-coordinator" -Destination "$env:USERPROFILE\.claude\skills\" -Recurse
-
-# Linux/macOS
-cp -r "N:/编程备份/3.0团队/deconstructors-team/skills/deconstructors-coordinator" ~/.claude/skills/
 ```
 
 **确认目录结构**：
