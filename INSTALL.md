@@ -1,163 +1,253 @@
-# 解构重筑者团队 - 安装说明
+# 解构重筑者团队安装指南
 
-## 系统要求
-
-- Claude Code CLI 或兼容的 AI 编程助手
-- 支持 YAML 前置元数据的 Markdown 解析能力
-- 推荐模型：GLM5、Claude Opus/Sonnet 等中文友好模型
-
-## 安装步骤
-
-### 步骤 1：安装专家 Agent
-
-```bash
-# Windows (Git Bash / PowerShell)
-mkdir -p ~/.claude/agents
-cp agents/deconstructors-profiler.md ~/.claude/agents/
-cp agents/deconstructors-strategist.md ~/.claude/agents/
-cp agents/deconstructors-scribe.md ~/.claude/agents/
-cp agents/deconstructors-hunter.md ~/.claude/agents/
-
-# macOS / Linux
-mkdir -p ~/.claude/agents
-cp agents/deconstructors-*.md ~/.claude/agents/
-```
-
-### 步骤 2：安装协调器 Skill
-
-```bash
-# Windows (Git Bash / PowerShell)
-mkdir -p ~/.claude/skills
-cp -r skills/deconstructors-coordinator ~/.claude/skills/
-
-# macOS / Linux
-mkdir -p ~/.claude/skills
-cp -r skills/deconstructors-coordinator ~/.claude/skills/
-```
-
-### 步骤 3：验证安装
-
-```bash
-# 检查 agents
-ls ~/.claude/agents/deconstructors-*.md
-
-# 应输出：
-# deconstructors-profiler.md
-# deconstructors-strategist.md
-# deconstructors-scribe.md
-# deconstructors-hunter.md
-
-# 检查 skill
-ls ~/.claude/skills/deconstructors-coordinator/
-
-# 应输出：
-# skill.md
-# references/
-```
-
-## 生效方式
-
-**重要**：修改或新增配置文件后，需要重启 Claude Code 会话才能加载新配置。
-
-1. 关闭当前 Claude Code 会话
-2. 重新启动 Claude Code
-3. 新配置将自动加载
-
-## 使用测试
-
-启动新会话后，测试团队是否正常工作：
-
-```
-用户：/deconstructors-coordinator 帮我分析当前目录的技术栈
-
-预期：协调器启动 Profiler 进行技术栈扫描
-```
-
-或直接调用专家：
-
-```
-用户：/deconstructors-profiler 扫描当前项目的技术栈
-
-预期：Profiler 输出技术栈指纹报告
-```
-
-## 配置说明
-
-### 专家工具权限
-
-| 专家 | 工具 | 权限级别 |
-|------|------|----------|
-| Profiler | Read, Glob, Grep, Bash | 只读 + 执行 |
-| Strategist | Read, Glob, Grep, Bash | 只读 + 执行 |
-| Hunter | Read, Glob, Grep, Bash, LSP | 只读 + 执行 |
-| Scribe | Read, Glob, Grep, Write, Edit, Bash | 写入 + 执行 |
-
-### 模型配置
-
-所有专家默认使用 `sonnet` 模型。可根据需要修改配置文件中的 `model` 字段：
-
-```yaml
-model: opus    # 更强推理能力
-model: haiku   # 更快响应速度
-model: inherit # 继承父会话模型
-```
-
-## 故障排除
-
-### 问题1：专家未被识别
-
-**症状**：调用 `/deconstructors-profiler` 无反应
-
-**解决方案**：
-1. 确认配置文件位于正确目录
-2. 确认已重启会话
-3. 检查配置文件格式是否正确
-4. 确认 YAML 前置元数据格式无误
-
-### 问题2：协调器无法调用专家
-
-**症状**：协调器只输出文字，不调用其他专家
-
-**解决方案**：
-1. 确认所有专家配置文件都已复制
-2. 确认专家配置文件名称包含 `deconstructors-` 前缀
-3. 确认协调器 skill 中的 subagent_type 与专家名称匹配
-
-### 问题3：中文输出乱码
-
-**症状**：文档中出现乱码
-
-**解决方案**：
-确保所有配置文件使用 UTF-8 编码保存。
-
-## 卸载
-
-### 用户级卸载
-
-```bash
-# Windows (Git Bash)
-rm ~/.claude/agents/deconstructors-*.md
-rm -rf ~/.claude/skills/deconstructors-coordinator
-
-# macOS / Linux
-rm ~/.claude/agents/deconstructors-*.md
-rm -rf ~/.claude/skills/deconstructors-coordinator
-```
-
-## 更新日志
-
-### v2.0.0 (2025)
-- 协调器从 Agent 改为 Skill 架构
-- 专家名称添加团队前缀避免重名
-- 新增 patterns-examples.md 参考文档
-- 强调委托优先原则
-
-### v1.0.0 (2024)
-- 基于 U.R.A.P v4.0 协议构建
-- 包含 4 位专家 + 1 位协调器
-- 实现五阶段标准流水线
-- 双维质量验收标准
+**版本**：3.0
+**平台**：Claude Code
+**最后更新**：2026-03-01
 
 ---
 
-如有问题，请参考 [README.md](README.md) 或查看配置文件中的详细说明。
+## 📋 前置要求
+
+- 已安装 Claude Code
+- 了解 Claude Code 技能和代理配置位置
+- **重要**：本机安装，不留老版本备份
+
+---
+
+## 🚀 快速安装
+
+### 步骤 1：备份现有配置（可选）
+
+如果之前已安装旧版本解构重筑者团队，建议先备份：
+
+```bash
+# Windows PowerShell
+Copy-Item -Path "$env:USERPROFILE\.claude\agents\deconstructors-*.md" -Destination "$env:USERPROFILE\.claude\agents\backup\" -Recurse
+Copy-Item -Path "$env:USERPROFILE\.claude\skills\deconstructors-coordinator" -Destination "$env:USERPROFILE\.claude\skills\backup\" -Recurse
+
+# Linux/macOS
+mkdir -p ~/.claude/agents/backup ~/.claude/skills/backup
+mv ~/.claude/agents/deconstructors-*.md ~/.claude/agents/backup/
+mv ~/.claude/skills/deconstructors-coordinator ~/.claude/skills/backup/
+```
+
+### 步骤 2：复制专家 Agent 配置
+
+```bash
+# Windows PowerShell
+Copy-Item -Path "N:\编程备份\3.0团队\deconstructors-team\agents\*.md" -Destination "$env:USERPROFILE\.claude\agents\"
+
+# Linux/macOS
+cp "N:/编程备份/3.0团队/deconstructors-team/agents/"*.md ~/.claude/agents/
+```
+
+**确认文件已复制**：
+- `deconstructors-profiler.md`
+- `deconstructors-strategist.md`
+- `deconstructors-hunter.md`
+- `deconstructors-scribe.md`
+
+### 步骤 3：复制协调器 Skill
+
+```bash
+# Windows PowerShell
+Copy-Item -Path "N:\编程备份\3.0团队\deconstructors-team\skills\deconstructors-coordinator" -Destination "$env:USERPROFILE\.claude\skills\" -Recurse
+
+# Linux/macOS
+cp -r "N:/编程备份/3.0团队/deconstructors-team/skills/deconstructors-coordinator" ~/.claude/skills/
+```
+
+**确认目录结构**：
+```
+~/.claude/skills/deconstructors-coordinator/
+└── skill.md
+```
+
+### 步骤 4：验证安装
+
+1. **重启 Claude Code** 或刷新技能列表
+2. **检查技能列表**：输入 `/` 查看 `deconstructors-coordinator` 是否在列表中
+3. **测试触发**：
+   ```
+   帮我分析这个项目的技术栈
+   ```
+   应该能看到解构重筑者协调器被触发
+
+---
+
+## 📂 配置文件详解
+
+### Agent 配置文件结构
+
+每个 `.md` 文件包含：
+
+```yaml
+---
+name: deconstructors-[expert-name]
+description: "使用场景描述..."
+tools: [工具列表]
+model: sonnet
+color: [颜色]
+---
+
+# [专家角色]
+
+## 核心职责
+...
+
+## 调度指令理解
+...
+```
+
+### Skill 配置文件结构
+
+```yaml
+---
+name: deconstructors-coordinator
+description: 协调器描述...
+---
+
+# 协调器说明
+
+## 核心原则
+...
+
+## 执行流程
+...
+```
+
+---
+
+## 🔧 配置验证
+
+### 验证清单
+
+安装完成后，请确认：
+
+- [ ] 4个 Agent 配置文件已复制到 `~/.claude/agents/`
+- [ ] 协调器 Skill 目录已复制到 `~/.claude/skills/`
+- [ ] 重启 Claude Code 后可以看到 `deconstructors-coordinator` 技能
+- [ ] 触发测试正常工作
+
+### 测试命令
+
+**测试1：技术栈识别**
+```
+帮我识别这个项目的技术栈
+```
+
+**测试2：完整流程**
+```
+帮我分析这个项目并生成文档
+```
+
+---
+
+## 🗑️ 卸载说明
+
+如需卸载解构重筑者团队：
+
+```bash
+# Windows PowerShell
+Remove-Item -Path "$env:USERPROFILE\.claude\agents\deconstructors-*.md"
+Remove-Item -Path "$env:USERPROFILE\.claude\skills\deconstructors-coordinator" -Recurse
+
+# Linux/macOS
+rm ~/.claude/agents/deconstructors-*.md
+rm -rf ~/.claude/skills/deconstructors-coordinator
+```
+
+---
+
+## ⚙️ 高级配置
+
+### 自定义 MCP 工具授权
+
+如需自定义各成员的 MCP 工具权限，编辑对应的 `.md` 文件：
+
+1. 打开 `~/.claude/agents/deconstructors-[expert-name].md`
+2. 修改 `tools:` 字段，添加/删除 MCP 工具
+3. 保存文件
+
+### 自定义协调器行为
+
+如需自定义协调器的执行流程，编辑 `~/.claude/skills/deconstructors-coordinator/skill.md`：
+
+1. 打开文件
+2. 修改执行流程章节
+3. 保存文件
+4. 重启 Claude Code
+
+---
+
+## 🐛 故障排查
+
+### 问题1：技能不显示
+
+**症状**：输入 `/` 后看不到 `deconstructors-coordinator`
+
+**可能原因**：
+1. Skill 文件未正确复制
+2. Skill 目录结构不正确
+3. Claude Code 未刷新
+
+**解决方法**：
+1. 确认 `~/.claude/skills/deconstructors-coordinator/skill.md` 文件存在
+2. 重启 Claude Code
+3. 如果还不行，检查 `skill.md` 文件格式是否正确
+
+### 问题2：Agent 触发失败
+
+**症状**：协调器尝试触发 Agent 时失败
+
+**可能原因**：
+1. Agent 配置文件未正确复制
+2. Agent 配置文件格式错误
+
+**解决方法**：
+1. 确认 `~/.claude/agents/` 目录下有4个 `deconstructors-*.md` 文件
+2. 检查文件格式是否正确（YAML frontmatter + Markdown 内容）
+3. 重启 Claude Code
+
+### 问题3：MCP 工具无法使用
+
+**症状**：Agent 提示无权限使用 MCP 工具
+
+**可能原因**：
+1. 协调器未授权 MCP 工具
+2. Agent 的 tools 字段未声明 MCP 工具
+
+**解决方法**：
+1. 协调器触发 Agent 时需包含 `🔓 MCP 授权` 声明
+2. 检查 Agent 配置文件的 `tools:` 字段是否包含对应 MCP 工具
+
+---
+
+## 📞 获取帮助
+
+如遇到安装问题：
+
+1. 查看 [README.md](README.md) 了解团队详情
+2. 查看 Claude Code 官方文档
+3. 通过 Claude Code 反馈渠道提交问题
+
+---
+
+## ✅ 安装完成
+
+安装完成后，解构重筑者团队将：
+
+- ✅ 自动识别项目技术栈
+- ✅ 智能制定分析策略
+- ✅ 深度分析代码逻辑
+- ✅ 生成高质量文档
+- ✅ 执行双维质量验收
+
+**开始使用**：
+```
+/deconstructors-coordinator
+```
+
+---
+
+*"好的开始是成功的一半。"* — 化名
